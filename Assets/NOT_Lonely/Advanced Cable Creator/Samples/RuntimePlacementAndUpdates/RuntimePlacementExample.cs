@@ -67,7 +67,7 @@ public class RuntimePlacementExample : MonoBehaviour
         //change everything you need just before the update...
         cablesTrail.controlPoints = points;
         cablesTrail.heightScale = heightScale;
-        cablesTrail.lengthDependentHeight = 0.01f;
+        cablesTrail.lengthDependentHeight = 0.1f;
         cablesTrail.lengthSegments = 12;
         cablesTrail.thickness = new Vector2(0.4f, 0.4f);
         cablesTrail.vertexAlphaBrightness = isRealtime ? 0 : 1;

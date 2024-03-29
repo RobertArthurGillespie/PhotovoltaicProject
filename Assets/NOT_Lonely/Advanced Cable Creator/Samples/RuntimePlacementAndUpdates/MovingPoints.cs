@@ -7,6 +7,7 @@ public class MovingPoints : MonoBehaviour
 {
     public RuntimePlacementExample placer;
     public List<Transform> pointsTracker = new List<Transform>();
+    public GameObject hitBinding;
     // Start is called before the first frame update
     void Start()
     {
@@ -57,8 +58,27 @@ public class MovingPoints : MonoBehaviour
             {
                 if (Physics.Raycast(ray, out hit, 1000))
                 {
-                    if (hit.transform.gameObject.name == "Cube")
+                    if (hit.transform.gameObject.name == "Cube"||hit.transform.gameObject.tag=="binding")
                     {
+                        if (hit.transform.gameObject.tag == "binding")
+                        {
+                            if (hit.transform.gameObject.GetComponent<MeshRenderer>().material.color != Color.red)
+                            {
+
+                            }
+                            hitBinding = hit.transform.gameObject;
+                            hit.transform.gameObject.GetComponent<MeshRenderer>().material.color = Color.red;
+                            Debug.Log("hit object is: " + hit.transform.gameObject.name);
+                        }
+                        if (hit.transform.gameObject.tag != "binding")
+                        {
+                            if (hitBinding != null)
+                            {
+                                hitBinding.GetComponent<MeshRenderer>().material.color = Color.white;
+
+                            }
+                            
+                        }
                         Debug.Log("hit cube");
                         placer.CreateNewPoint(hit.point);
                         if (placer.dragPoints.Count > 7)
