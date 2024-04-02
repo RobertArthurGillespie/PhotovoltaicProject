@@ -1,13 +1,20 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class MovingPoints : MonoBehaviour
 {
     public RuntimePlacementExample placer;
     public List<Transform> pointsTracker = new List<Transform>();
+    public List<GameObject> UIDialogObjs = new List<GameObject>();
     public GameObject hitBinding;
+    public TextMeshProUGUI readingLabel;
+    public bool readingTaken = false;
+    public bool shouldBlur = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -17,6 +24,29 @@ public class MovingPoints : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            if(!GameObject.Find("Main Camera").GetComponent<Volume>().enabled)
+            {
+                GameObject.Find("Main Camera").GetComponent<Volume>().enabled = true;
+
+            }
+            else if(GameObject.Find("Main Camera").GetComponent<Volume>().enabled)
+            {
+                GameObject.Find("Main Camera").GetComponent<Volume>().enabled = false;
+            }
+            foreach(GameObject g in UIDialogObjs)
+            {
+                if (!g.active)
+                {
+                    g.SetActive(true);
+                }
+                else if (g.active)
+                {
+                    g.SetActive(false);
+                }
+            }
+        }
         if (GameObject.Find("Point(Clone)") != null)
         {
             /*GameObject point = GameObject.Find("Point(Clone)");
@@ -68,6 +98,12 @@ public class MovingPoints : MonoBehaviour
                             }
                             hitBinding = hit.transform.gameObject;
                             hit.transform.gameObject.GetComponent<MeshRenderer>().material.color = Color.red;
+                            if (!readingTaken)
+                            {
+                                readingTaken = true;
+                                GenerateReading();
+                            }
+                            
                             Debug.Log("hit object is: " + hit.transform.gameObject.name);
                         }
                         if (hit.transform.gameObject.tag != "binding")
@@ -75,6 +111,7 @@ public class MovingPoints : MonoBehaviour
                             if (hitBinding != null)
                             {
                                 hitBinding.GetComponent<MeshRenderer>().material.color = Color.white;
+                                readingTaken = false;
 
                             }
                             
@@ -85,7 +122,7 @@ public class MovingPoints : MonoBehaviour
                         {
                             Debug.Log("deleting point");
                             int prevPoint = placer.dragPoints.Count - 2;
-                            Object.Destroy(placer.dragPoints[prevPoint].gameObject);
+                            UnityEngine.Object.Destroy(placer.dragPoints[prevPoint].gameObject);
                             placer.dragPoints[prevPoint].onPointDestroy.Invoke(placer.dragPoints[prevPoint].transform);
                             /*int prevPoint2 = placer.dragPoints.Count - 2;
                             Object.Destroy(placer.dragPoints[prevPoint2].gameObject);
@@ -108,5 +145,12 @@ public class MovingPoints : MonoBehaviour
             yield return null;
         }
         
+    }
+
+    public void GenerateReading()
+    {
+        float randomFloat = UnityEngine.Random.Range(0f, 50f);
+        double randomRounded = System.Math.Round(randomFloat, 2);
+        readingLabel.text = "Value: " + randomRounded;
     }
 }
