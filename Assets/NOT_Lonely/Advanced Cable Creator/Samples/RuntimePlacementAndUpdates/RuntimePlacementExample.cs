@@ -7,6 +7,8 @@ public class RuntimePlacementExample : MonoBehaviour
     public ACC_Trail cablesTrail;
     public List<Transform> points = new List<Transform>();
     public List<DragablePoint> dragPoints = new List<DragablePoint>();
+    public List<DragablePoint> dragGroundPoints = new List<DragablePoint>();
+    public bool hasClearedpoints = false;
     public Material[] newMaterials;
     public DragablePoint pointPrefab;
     private bool isRealtime = false;
@@ -22,8 +24,27 @@ public class RuntimePlacementExample : MonoBehaviour
 
     public void CreateNewCable()
     {
-        cablesTrail = new GameObject("Cable Trail", typeof(ACC_Trail)).GetComponent<ACC_Trail>();
-        cablesTrail.CreateFirstCableSegment(cablesTrail.transform);
+        if(GameObject.Find("EventSystem").GetComponent<MovingPoints>() != null)
+        {
+            if (GameObject.Find("EventSystem").GetComponent<MovingPoints>().isGroundCable)
+            {
+                newMaterials = GameObject.Find("EventSystem").GetComponent<MovingPoints>().groundCableMats;
+                cablesTrail = new GameObject("Ground Trail", typeof(ACC_Trail)).GetComponent<ACC_Trail>();
+                cablesTrail.CreateFirstCableSegment(cablesTrail.transform);
+            }
+            else
+            {
+                cablesTrail = new GameObject("Cable Trail", typeof(ACC_Trail)).GetComponent<ACC_Trail>();
+                cablesTrail.CreateFirstCableSegment(cablesTrail.transform);
+
+            }
+        }
+        else
+        {
+            cablesTrail = new GameObject("Cable Trail", typeof(ACC_Trail)).GetComponent<ACC_Trail>();
+            cablesTrail.CreateFirstCableSegment(cablesTrail.transform);
+        }
+        
 
         CreateNewPoint(Vector3.left * 10);
         CreateNewPoint(Vector3.right * 10);
@@ -36,7 +57,23 @@ public class RuntimePlacementExample : MonoBehaviour
         point.onPointDestroy += RemovePointFromListAndUpdate;
         point.onPointRelease += UpdateCable;
         points.Add(point.transform);
-        dragPoints.Add(point);
+        if (GameObject.Find("EventSystem").GetComponent<MovingPoints>() != null)
+        {
+            if (GameObject.Find("EventSystem").GetComponent<MovingPoints>().isGroundCable)
+            {
+                if (!hasClearedpoints)
+                {
+                    points.Clear();
+                    hasClearedpoints = true;
+                }
+                dragGroundPoints.Add(point);
+            }
+            else
+            {
+                dragPoints.Add(point);
+            }
+        }
+        
 
         if (points.Count > 1)
         {

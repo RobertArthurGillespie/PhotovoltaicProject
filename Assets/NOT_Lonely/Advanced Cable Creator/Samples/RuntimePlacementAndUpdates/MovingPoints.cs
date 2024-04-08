@@ -15,6 +15,9 @@ public class MovingPoints : MonoBehaviour
     public TextMeshProUGUI readingLabel;
     public bool readingTaken = false;
     public bool shouldBlur = false;
+    public bool isGroundCable = false;
+    public bool groundCableFinished = false;
+    public Material[] groundCableMats;
     // Start is called before the first frame update
     void Start()
     {
@@ -98,7 +101,11 @@ public class MovingPoints : MonoBehaviour
                             }
                             hitBinding = hit.transform.gameObject;
                             hit.transform.gameObject.GetComponent<MeshRenderer>().material.color = Color.red;
-                            if (!readingTaken)
+                            if (!groundCableFinished)
+                            {
+                                groundCableFinished = true;
+                            }
+                            else if (!readingTaken&&placer.dragGroundPoints.Count>2)
                             {
                                 readingTaken = true;
                                 GenerateReading();
@@ -133,6 +140,71 @@ public class MovingPoints : MonoBehaviour
                         
                         
                         
+                    }
+                }
+                
+            }
+            else if (Input.GetMouseButton(1))
+            {
+                Debug.Log("Right Mouse Button down");
+                if (groundCableFinished)
+                {
+                    if (Physics.Raycast(ray, out hit, 1000))
+                    {
+                        if (!isGroundCable)
+                        {
+                            isGroundCable = true;
+                            //placer.newMaterials = groundCableMats;
+                            placer.CreateNewCable();
+                        }
+
+                        if (hit.transform.gameObject.name == "Cube" || hit.transform.gameObject.tag == "binding")
+                        {
+                            if (hit.transform.gameObject.tag == "binding")
+                            {
+                                if (hit.transform.gameObject.GetComponent<MeshRenderer>().material.color != Color.red)
+                                {
+
+                                }
+                                hitBinding = hit.transform.gameObject;
+                                hit.transform.gameObject.GetComponent<MeshRenderer>().material.color = Color.red;
+                                if (!readingTaken)
+                                {
+                                    readingTaken = true;
+                                    GenerateReading();
+                                }
+
+                                Debug.Log("hit object is: " + hit.transform.gameObject.name);
+                            }
+                            if (hit.transform.gameObject.tag != "binding")
+                            {
+                                if (hitBinding != null)
+                                {
+                                    hitBinding.GetComponent<MeshRenderer>().material.color = Color.white;
+                                    readingTaken = false;
+
+                                }
+
+                            }
+                            Debug.Log("hit cube");
+                            Debug.Log("ground points count currently: " + placer.dragGroundPoints.Count);
+                            placer.CreateNewPoint(hit.point);
+                            if (placer.dragGroundPoints.Count > 7)
+                            {
+                                Debug.Log("deleting point");
+                                int prevPoint = placer.dragGroundPoints.Count - 2;
+                                UnityEngine.Object.Destroy(placer.dragGroundPoints[prevPoint].gameObject);
+                                placer.dragGroundPoints[prevPoint].onPointDestroy.Invoke(placer.dragGroundPoints[prevPoint].transform);
+                                /*int prevPoint2 = placer.dragPoints.Count - 2;
+                                Object.Destroy(placer.dragPoints[prevPoint2].gameObject);
+                                placer.dragPoints[prevPoint2].onPointDestroy.Invoke(placer.dragPoints[prevPoint2].transform);
+                                placer.dragPoints.RemoveAt(prevPoint);
+                                placer.dragPoints.RemoveAt(prevPoint2);*/
+                            }
+
+
+
+                        }
                     }
                 }
                 
