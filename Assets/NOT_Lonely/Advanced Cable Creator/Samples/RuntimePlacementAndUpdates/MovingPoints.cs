@@ -22,12 +22,19 @@ public class MovingPoints : MonoBehaviour
     void Start()
     {
         StartCoroutine(MovePoint());
+        placer.CreateNewPoint(Camera.main.transform.position - new Vector3(-3f, -3f, -3f));
+        placer.CreateNewPoint(Camera.main.transform.position - new Vector3(-3f, -3f, -3f));
+        placer.CreateNewPoint(Camera.main.transform.position - new Vector3(-3f, -3f, -3f));
+        placer.CreateNewPoint(Camera.main.transform.position - new Vector3(-3f, -3f, -3f));
+        placer.CreateNewPoint(Camera.main.transform.position - new Vector3(-3f, -3f, -3f));
+        placer.CreateNewPoint(Camera.main.transform.position - new Vector3(-3f, -3f, -3f));
+        placer.CreateNewPoint(Camera.main.transform.position - new Vector3(-3f, -3f, -3f));
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        /*if (Input.GetKeyDown(KeyCode.Space))
         {
             if(!GameObject.Find("Main Camera").GetComponent<Volume>().enabled)
             {
@@ -49,7 +56,7 @@ public class MovingPoints : MonoBehaviour
                     g.SetActive(false);
                 }
             }
-        }
+        }*/
         if (GameObject.Find("Point(Clone)") != null)
         {
             /*GameObject point = GameObject.Find("Point(Clone)");
@@ -105,7 +112,7 @@ public class MovingPoints : MonoBehaviour
                             {
                                 groundCableFinished = true;
                             }
-                            else if (!readingTaken&&placer.dragGroundPoints.Count>2)
+                            else if (!readingTaken)
                             {
                                 readingTaken = true;
                                 GenerateReading();
@@ -154,8 +161,15 @@ public class MovingPoints : MonoBehaviour
                         if (!isGroundCable)
                         {
                             isGroundCable = true;
-                            //placer.newMaterials = groundCableMats;
+                            placer.newMaterials = groundCableMats;
                             placer.CreateNewCable();
+                            placer.CreateNewPoint(Camera.main.transform.position - new Vector3(-3f, -3f, -3f));
+                            placer.CreateNewPoint(Camera.main.transform.position - new Vector3(-3f, -3f, -3f));
+                            placer.CreateNewPoint(Camera.main.transform.position - new Vector3(-3f, -3f, -3f));
+                            placer.CreateNewPoint(Camera.main.transform.position - new Vector3(-3f, -3f, -3f));
+                            placer.CreateNewPoint(Camera.main.transform.position - new Vector3(-3f, -3f, -3f));
+                            placer.CreateNewPoint(Camera.main.transform.position - new Vector3(-3f, -3f, -3f));
+                            placer.CreateNewPoint(Camera.main.transform.position - new Vector3(-3f, -3f, -3f));
                         }
 
                         if (hit.transform.gameObject.name == "Cube" || hit.transform.gameObject.tag == "binding")
@@ -221,11 +235,14 @@ public class MovingPoints : MonoBehaviour
 
     public void GenerateReading()
     {
+        Debug.Log("generating reading");
         float randomFloat = UnityEngine.Random.Range(0f, 50f);
         double randomRounded = System.Math.Round(randomFloat, 2);
         readingLabel.text = "Value: " + randomRounded;
         GameObject.Find("noteValueText").GetComponent<TextMeshPro>().text = randomRounded.ToString();
-        StartCoroutine(FadeInAndOpenNotebook());
+        GameObject.Find("noteValueTextForm").GetComponent<TextMeshPro>().text = randomRounded.ToString();
+        GameObject.Find("clampMeterDisplay").GetComponent<TextMeshPro>().text = "VOC: "+randomRounded.ToString();
+        StartCoroutine(FadeInAndFillOutForm());
     }
 
     public IEnumerator FadeInAndOpenNotebook()
@@ -261,6 +278,50 @@ public class MovingPoints : MonoBehaviour
                 float noteTextAlpha = GameObject.Find("noteValueText").GetComponent<TextMeshPro>().color.a;
                 noteTextAlpha += 0.1f;
                 GameObject.Find("noteValueText").GetComponent<TextMeshPro>().color = new Color(GameObject.Find("noteValueText").GetComponent<TextMeshPro>().color.r, GameObject.Find("noteValueText").GetComponent<TextMeshPro>().color.g, GameObject.Find("noteValueText").GetComponent<TextMeshPro>().color.b, noteTextAlpha);
+                //GameObject.Find("noteValueText").GetComponent<MeshRenderer>().material = noteTextMat;
+            }
+            else
+            {
+                break;
+            }
+            yield return new WaitForSeconds(0.05f);
+        }
+        yield return null;
+    }
+
+    public IEnumerator FadeInAndFillOutForm()
+    {
+        Debug.Log("fading in notebook");
+        Material notepadMat = GameObject.Find("Form").GetComponent<MeshRenderer>().material;
+        while (true)
+        {
+            if (notepadMat.color.a < 1f)
+            {
+                float notePadAlpha = notepadMat.color.a;
+                notePadAlpha += 0.1f;
+                notepadMat.color = new Color(notepadMat.color.r, notepadMat.color.g, notepadMat.color.b, notePadAlpha);
+                GameObject.Find("Form").GetComponent<MeshRenderer>().material = notepadMat;
+                //GameObject.Find("notepad_bottom").GetComponent<MeshRenderer>().material = notepadMat;
+                //GameObject.Find("notepad_top").GetComponent<MeshRenderer>().material = notepadMat;
+                Debug.Log("notepad alpha is: " + notepadMat.color.a);
+            }
+            else
+            {
+                break;
+            }
+            yield return new WaitForSeconds(0.05f);
+        }
+        //GameObject.Find("Notepad").GetComponent<Animator>().SetBool("OpenNotebook", true);
+        yield return new WaitForSeconds(1f);
+        //Material noteTextMat = GameObject.Find("noteValueText").GetComponent<MeshRenderer>().material;
+
+        while (true)
+        {
+            if (GameObject.Find("noteValueTextForm").GetComponent<TextMeshPro>().color.a < 1f)
+            {
+                float noteTextAlpha = GameObject.Find("noteValueTextForm").GetComponent<TextMeshPro>().color.a;
+                noteTextAlpha += 0.1f;
+                GameObject.Find("noteValueTextForm").GetComponent<TextMeshPro>().color = new Color(GameObject.Find("noteValueTextForm").GetComponent<TextMeshPro>().color.r, GameObject.Find("noteValueTextForm").GetComponent<TextMeshPro>().color.g, GameObject.Find("noteValueTextForm").GetComponent<TextMeshPro>().color.b, noteTextAlpha);
                 //GameObject.Find("noteValueText").GetComponent<MeshRenderer>().material = noteTextMat;
             }
             else
